@@ -278,7 +278,7 @@ print("Please, wait...")
 check_query()
 
 
-poly_resp = api.get(
+bui_resp = api.get(
 """[out:json][timeout:1800];
 (
 way["building"~"."]{bbox};
@@ -288,40 +288,18 @@ out geom;""".format(bbox=bbox),
 build=False, responseformat="json")
 
 
-# getting polygon geometry
-try:
-    coords = []
-    tags=[]
-    osmid=[]
-    for element in poly_resp['elements']:
-        if element['type'] == 'way':
-            one_line = []
-            for j in range(len(element['geometry'])):
-                lon = element['geometry'][j]['lon']
-                lat = element['geometry'][j]['lat']
-                one_line.append((lon, lat))
-            coords.append(Polygon(one_line))
-            try:
-                tag = str(element['tags'])
-            except:
-                tag = None
-            tags.append(tag)
-            osmid.append(element['id'])
+print("Getting borders")
+print("Please, wait...")
+
+check_query()
+
+#
+poly_resp = api.get(
+    """[out:json][timeout:25];
+    {}({});
+    (._;>;);
+    out geom;""".format(type_resp,poly_osmid), 
+    build=False, responseformat="json")
 # 
-except:
-    pass
-#
 
-
-gdf_bui = gpd.GeoDataFrame(geometry=coords)
-gdf_bui.crs='epsg:4326'
-
-gdf_bui['tags'] = tags
-gdf_bui['osm_id'] = osmid
-
-try:
-    gdf_bui.to_file('{}\\buildings__{}_{}_{}.shp'.format(path_raw_shp_poly,buff_km, place, str_date), encoding='utf-8')
-except:
-    print("Error, shp not saved")
-#
 print("Done")
