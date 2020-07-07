@@ -68,6 +68,16 @@ str_date = buildings_from_osm.str_date
 
 ################
 
+###############
+len_elem = len(bui_resp['elements'])
+time_min = int(len_elem / 10000 / 60)
+time_max = int(len_elem / 8000 / 60)
+
+# time_start = "{:%H:%M:%S}".format(datetime.now())
+# print("time start:", time_start)
+print("Estimated time: {} to {} minutes".format(time_min,time_max))
+###############
+
 # getting polygon geometry
 try:
     coords = []
@@ -137,7 +147,9 @@ except:
 if int(buff_km) > 0:
     buffer = int(buff_km) * 1000
     try:
+        gdf_poly.crs = 'epsg:4326'
         gdf_poly.geometry = gdf_poly.geometry.to_crs('epsg:32637').buffer(buffer).to_crs('epsg:4326')
+        gdf_poly.crs = 'epsg:4326'
     except:
         pass
 #
